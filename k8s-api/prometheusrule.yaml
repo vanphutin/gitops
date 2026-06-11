@@ -12,11 +12,11 @@ spec:
         - alert: ApiHighErrorRate
           expr: |
             (
-              sum(rate(flask_http_request_total{namespace="demo", status=~"5.."}[30s])) or vector(0)
+              sum(rate(flask_http_request_total{namespace="demo", status=~"5.."}[1m])) or vector(0)
             )
             /
             clamp_min(
-              sum(rate(flask_http_request_total{namespace="demo"}[30s])) or vector(0),
+              sum(rate(flask_http_request_total{namespace="demo"}[1m])) or vector(0),
               0.001
             )
             > 0.05
