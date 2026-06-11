@@ -22,6 +22,7 @@ spec:
             > 0.05
           for: 0s
           labels:
+            namespace: demo
             severity: warning
             service: api
             slo: api-success-rate-95
