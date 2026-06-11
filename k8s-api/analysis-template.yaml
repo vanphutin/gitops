@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: api-error-rate
+  namespace: demo
+spec:
+  metrics:
+    - name: api-error-rate
+      interval: 20s
+      count: 3
+      failureLimit: 1
+      successCondition: result[0] < 0.05
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(flask_http_request_total{namespace="demo", status=~"5.."}[1m])) or vector(0)
+            )
+            /
+            clamp_min(
+              sum(rate(flask_http_request_total{namespace="demo"}[1m])) or vector(0),
+              0.001
+            )

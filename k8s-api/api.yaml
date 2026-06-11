@@ -26,7 +26,7 @@ spec:
             - name: ERROR_RATE
               value: "0"
             - name: VERSION
-              value: "v2"
+              value: "v3"
           readinessProbe:
             httpGet:
               path: /healthz
@@ -35,10 +35,13 @@ spec:
     canary:
       steps:
         - setWeight: 25
-        - pause: {}
+        - analysis:
+            templates:
+              - templateName: api-error-rate
         - setWeight: 50
-        - pause:
-            duration: 30s
+        - analysis:
+            templates:
+              - templateName: api-error-rate
         - setWeight: 100
 ---
 apiVersion: v1
