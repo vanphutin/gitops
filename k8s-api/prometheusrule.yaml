@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: api-slo-alerts
+  namespace: demo
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: api.slo
+      rules:
+        - alert: ApiHighErrorRate
+          expr: |
+            (
+              sum(rate(flask_http_request_total{namespace="demo", status=~"5.."}[1m])) or vector(0)
+            )
+            /
+            clamp_min(
+              sum(rate(flask_http_request_total{namespace="demo"}[1m])) or vector(0),
+              0.001
+            )
+            > 0.05
+          for: 30s
+          labels:
+            severity: warning
+            service: api
+            slo: api-success-rate-95
+          annotations:
+            summary: "API error rate is above 5%"
+            description: "The api service is violating the 95% success-rate SLO."
